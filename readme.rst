@@ -6,6 +6,8 @@ Relative Buffer Names
 A minimal minor-mode that sets project relative paths for buffer names
 with optional path abbreviation.
 
+Available via `melpa <https://melpa.org/#/buffer-name-relative>`__.
+
 
 Motivation
 ==========
