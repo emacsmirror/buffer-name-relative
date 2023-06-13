@@ -14,6 +14,18 @@ Motivation
 
 To be able to easily identify buffer names where similar named files exist within a project.
 
+.. figure:: https://codeberg.org/attachments/324d3daa-3b7e-4ebb-8884-84605adc9d96
+   :scale: 50 %
+   :align: center
+
+   Before.
+
+.. figure:: https://codeberg.org/attachments/abcd390e-44c8-461b-84ab-5fbe3dc91e84
+   :scale: 50 %
+   :align: center
+
+   After.
+
 
 Usage
 =====
