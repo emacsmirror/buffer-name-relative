@@ -51,7 +51,7 @@ Any errors are demoted into messages."
   :type '(repeat symbol))
 
 (defcustom buffer-name-relative-fallback 'default
-  "The name to use when the root directory can't be found."
+  "Behavior when the root directory can't be found."
   :type
   '(choice (const :tag "Default Directory" default)
            (const :tag "Absolute Path" absolute)

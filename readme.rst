@@ -66,7 +66,7 @@ Customization
    :After: ``./s/p/k/keymap_d~/keymap_default.py``
 
 ``buffer-name-relative-fallback``: ``'default``
-   The directory to use when a project root is not found, valid options:
+   Behavior when a root directory isn't found, valid options:
 
    ``'default``
       Name relative to the buffers ``default-directory``.
