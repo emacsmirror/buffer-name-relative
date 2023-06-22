@@ -41,8 +41,16 @@
   :group 'convenience)
 
 (defcustom buffer-name-relative-prefix "./"
-  "Text to include before relative paths."
-  :type 'string)
+  "Text to include before relative paths.
+Or optionally a pair of strings which surround the project
+directory name."
+  :type '(choice string (cons string string)))
+
+(defcustom buffer-name-relative-prefix-map nil
+  "Optional abbreviations of project paths.
+You may wish to use short abbreviation for project names,
+otherwise the parent directory will be used."
+  :type '(alist :key-type string :value-type string))
 
 (defcustom buffer-name-relative-root-functions (list 'buffer-name-relative-root-path-from-vc)
   "List of functions symbols which take a file-path and return a root path or nil.
@@ -169,7 +177,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
   (let ((base-path (buffer-name-relative--root-path-lookup filepath)))
     (cond
      (base-path
-      (let ((filepath-rel-prefix buffer-name-relative-prefix)
+      (let ((filepath-rel-prefix nil)
             (filepath-rel (file-relative-name filepath base-path)))
 
         ;; Ensure the relative version of the path is not "worse" (by some definition).
@@ -188,14 +196,47 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
             (let ((beg (string-match-p "[^/]" filepath)))
               (setq filepath-rel-prefix (substring filepath 0 beg))
               (setq filepath-rel (substring filepath beg))))))
-         ;; Common case, the relative path is a child of the `base-path'.
-         (t
+         ((string-equal base-path "~/")
+          ;; It's possible the root happens to be use users home directory.
+          (setq filepath-rel-prefix base-path)))
+
+        (unless filepath-rel-prefix
+          ;; Common case, the relative path is a child of the `base-path'.
           ;; In most cases no changes are needed here,
           ;; although in the event we would like to do literal replacements
           ;; for a known `base-path', this is the place to do it.
-          (when (string-equal base-path "~/")
-            ;; It's possible the root happens to be use users home directory.
-            (setq filepath-rel-prefix base-path))))
+          (setq filepath-rel-prefix
+                (cond
+                 ((stringp buffer-name-relative-prefix)
+                  buffer-name-relative-prefix)
+                 ;; Extra strict check as throwing an error here
+                 ;; will cause the buffer not to load properly.
+                 ((and (consp buffer-name-relative-prefix)
+                       (stringp (car buffer-name-relative-prefix))
+                       (stringp (cdr buffer-name-relative-prefix)))
+                  (let ((base-path-noslash (directory-file-name base-path)))
+                    (concat
+                     (car buffer-name-relative-prefix)
+                     (let ((test-value
+                            (alist-get base-path-noslash buffer-name-relative-prefix-map
+                                       nil
+                                       nil
+                                       #'equal)))
+                       (when (and test-value (not (stringp test-value)))
+                         (message
+                          (concat
+                           "warning: `buffer-name-relative-prefix-project' "
+                           "contains non-string value (%S), ignoring"
+                           test-value))
+                         (setq test-value nil))
+                       (or test-value (file-name-base base-path-noslash)))
+                     (cdr buffer-name-relative-prefix))))
+                 (t
+                  (message
+                   (concat
+                    "warning: `buffer-name-relative-prefix-project' "
+                    "must be a string or a cons pair of strings"))
+                  "./"))))
 
         ;; Abbreviate?
         (unless (zerop buffer-name-relative-abbrev-limit)

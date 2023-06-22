@@ -44,6 +44,25 @@ Customization
 ``buffer-name-relative-prefix``: ``"./"``
    The prefix added before the relative path.
 
+   When a cons pair of strings, show the project directory before the relative path, e.g.
+
+   A value of ``'("<" . ">/")`` will show ``<project>/file.txt`` instead of ``./file.txt``.
+
+   Otherwise set this to a string ``"./"`` which avoids showing the project prefix entirely.
+
+``buffer-name-relative-prefix-map``: ``nil``
+   Optional association-list mapping project paths to abbreviated names,
+   allowing you to pick brief identifiers for your project names.
+
+   The keys for this list are strings representing the project directories (without a trailing slash),
+   the values are strings with the abbreviated names. e.g.
+
+   .. code-block::
+
+      (setq buffer-name-relative-prefix-map
+            '("/src/dotfiles" . "DOT")
+             ("/src/project" . "PRJ")))
+
 ``buffer-name-relative-root-functions``: ``(list 'buffer-name-relative-root-path-from-vc)``
    A list of functions that take a file-path and return a string or nil.
    The root directory used will be the first of these function to return a non-nil string.
