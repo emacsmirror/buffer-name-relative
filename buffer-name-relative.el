@@ -172,6 +172,42 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
       (error (message "Error creating vc-backend root name: %s" err)))
     buf))
 
+(defun buffer-name-relative--root-path-calc-prefix (base-path)
+  "Given a BASE-PATH, return a prefix to show before the relative path."
+  (cond
+   ((stringp buffer-name-relative-prefix)
+    ;; String literal result.
+    buffer-name-relative-prefix)
+   ;; Coerce non-strings as an error here will cause the buffer not to load properly.
+   ((consp buffer-name-relative-prefix)
+    (let* ((base-path-noslash (directory-file-name base-path))
+           (str-beg (car buffer-name-relative-prefix))
+           (str-end (cdr buffer-name-relative-prefix))
+           (str-body nil))
+      (when buffer-name-relative-prefix-map
+        (setq str-body
+              (alist-get base-path-noslash buffer-name-relative-prefix-map nil nil #'equal)))
+      (unless (stringp str-body)
+        (setq str-body
+              (cond
+               ((null str-body)
+                (file-name-base base-path-noslash))
+               (t
+                (format "%S" str-body)))))
+      (unless (stringp str-beg)
+        (setq str-beg (format "%S" str-beg)))
+      (unless (stringp str-end)
+        (setq str-end (format "%S" str-end)))
+      ;; Project prefix result.
+      (concat str-beg str-body str-end)))
+   (t
+    (message
+     (concat
+      "warning: `buffer-name-relative-prefix-project' "
+      "must be a string or a cons pair of strings"))
+    ;; Fallback prefix result
+    "?/")))
+
 (defun buffer-name-relative--root-path-calc-relative (filepath)
   "Return the version control relative path to FILEPATH."
   (let ((base-path (buffer-name-relative--root-path-lookup filepath)))
@@ -205,38 +241,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
           ;; In most cases no changes are needed here,
           ;; although in the event we would like to do literal replacements
           ;; for a known `base-path', this is the place to do it.
-          (setq filepath-rel-prefix
-                (cond
-                 ((stringp buffer-name-relative-prefix)
-                  buffer-name-relative-prefix)
-                 ;; Extra strict check as throwing an error here
-                 ;; will cause the buffer not to load properly.
-                 ((and (consp buffer-name-relative-prefix)
-                       (stringp (car buffer-name-relative-prefix))
-                       (stringp (cdr buffer-name-relative-prefix)))
-                  (let ((base-path-noslash (directory-file-name base-path)))
-                    (concat
-                     (car buffer-name-relative-prefix)
-                     (let ((test-value
-                            (alist-get base-path-noslash buffer-name-relative-prefix-map
-                                       nil
-                                       nil
-                                       #'equal)))
-                       (when (and test-value (not (stringp test-value)))
-                         (message
-                          (concat
-                           "warning: `buffer-name-relative-prefix-project' "
-                           "contains non-string value (%S), ignoring"
-                           test-value))
-                         (setq test-value nil))
-                       (or test-value (file-name-base base-path-noslash)))
-                     (cdr buffer-name-relative-prefix))))
-                 (t
-                  (message
-                   (concat
-                    "warning: `buffer-name-relative-prefix-project' "
-                    "must be a string or a cons pair of strings"))
-                  "./"))))
+          (setq filepath-rel-prefix (buffer-name-relative--root-path-calc-prefix base-path)))
 
         ;; Abbreviate?
         (unless (zerop buffer-name-relative-abbrev-limit)
