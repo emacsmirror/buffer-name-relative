@@ -203,8 +203,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
    (t
     (message
      (concat
-      "warning: `buffer-name-relative-prefix-project' "
-      "must be a string or a cons pair of strings"))
+      "warning: `buffer-name-relative-prefix' " "must be a string or a cons pair of strings"))
     ;; Fallback prefix result
     "?/")))
 
