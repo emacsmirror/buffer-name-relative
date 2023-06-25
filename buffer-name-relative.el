@@ -201,9 +201,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
       ;; Project prefix result.
       (concat str-beg str-body str-end)))
    (t
-    (message
-     (concat
-      "warning: `buffer-name-relative-prefix' " "must be a string or a cons pair of strings"))
+    (message "warning: `buffer-name-relative-prefix' must be a string or a cons pair of strings")
     ;; Fallback prefix result
     "?/")))
 
