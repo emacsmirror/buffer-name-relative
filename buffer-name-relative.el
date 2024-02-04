@@ -5,7 +5,7 @@
 
 ;; Author: Campbell Barton <ideasman42@gmail.com>
 
-;; URL: https://codeberg.com/ideasman42/emacs-buffer-name-relative
+;; URL: https://codeberg.org/ideasman42/emacs-buffer-name-relative
 ;; Keywords: convenience
 ;; Version: 0.1
 ;; Package-Requires: ((emacs "28.1"))
