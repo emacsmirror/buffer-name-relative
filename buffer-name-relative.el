@@ -75,6 +75,7 @@ Any errors are demoted into messages."
 
 (defun buffer-name-relative--abbrev-directory-impl (path overflow)
   "Abbreviate PATH by OVERFLOW characters."
+  (declare (important-return-value t))
   ;; Skip leading slashes.
   (let ((beg (string-match-p "[^/]" path)))
     (cond
@@ -112,6 +113,7 @@ Any errors are demoted into messages."
 
 (defun buffer-name-relative--abbrev-directory (path path-len-goal)
   "Abbreviate PATH to PATH-LEN-GOAL (if possible)."
+  (declare (important-return-value t))
   (let ((overflow (- (length path) path-len-goal)))
     (cond
      ((<= overflow 0)
@@ -123,6 +125,7 @@ Any errors are demoted into messages."
 
 (defun buffer-name-relative--root-path-lookup (filepath)
   "Lookup `buffer-name-relative-root-functions' using FILEPATH for a relative directory."
+  (declare (important-return-value t))
   (let ((name-base nil)
         (functions buffer-name-relative-root-functions))
     (while functions
@@ -155,6 +158,7 @@ Any errors are demoted into messages."
   "VCS root-relative buffer name (where possible).
 Advice around `create-file-buffer'.
 Wrap ORIG-FN, which creates a buffer from FILEPATH."
+  (declare (important-return-value t))
   (let ((buf (funcall orig-fn filepath)))
     ;; Error's are very unlikely, this is to ensure even the most remote
     ;; chance of an error doesn't make the file fail to load.
@@ -174,6 +178,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
 
 (defun buffer-name-relative--root-path-calc-prefix (base-path)
   "Given a BASE-PATH, return a prefix to show before the relative path."
+  (declare (important-return-value t))
   (cond
    ((stringp buffer-name-relative-prefix)
     ;; String literal result.
@@ -207,6 +212,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
 
 (defun buffer-name-relative--root-path-calc-relative (filepath)
   "Return the version control relative path to FILEPATH."
+  (declare (important-return-value t))
   (let ((base-path (buffer-name-relative--root-path-lookup filepath)))
     (cond
      (base-path
@@ -265,6 +271,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
 
 (defun buffer-name-relative-root-path-from-vc (filepath)
   "Return the version control directory from FILEPATH or nil."
+  (declare (important-return-value t))
   ;; Any unlikely errors will be caught by the caller,
   ;; ignore errors from `vc-responsible-backend' because this causes noise
   ;; in the case it can't be detected.
@@ -278,6 +285,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
 
 (defun buffer-name-relative-root-path-from-ffip (filepath)
   "Return the FFIP directory from FILEPATH or nil."
+  (declare (important-return-value t))
   (let ((result nil))
     (when (fboundp 'ffip-project-root)
       (let ((dir (file-name-directory filepath)))
@@ -290,6 +298,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
 
 (defun buffer-name-relative-root-path-from-projectile (filepath)
   "Return the PROJECTILE directory from FILEPATH or nil."
+  (declare (important-return-value t))
   (let ((result nil))
     (when (fboundp 'projectile-project-root)
       (let ((dir (file-name-directory filepath)))
@@ -304,10 +313,12 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
 
 (defun buffer-name-relative--mode-enable ()
   "Turn on `buffer-name-relative-mode' globally."
+  (declare (important-return-value nil))
   (advice-add 'create-file-buffer :around #'buffer-name-relative--create-file-buffer-advice))
 
 (defun buffer-name-relative--mode-disable ()
   "Turn on `buffer-name-relative-mode' globally."
+  (declare (important-return-value nil))
   (advice-remove 'create-file-buffer #'buffer-name-relative--create-file-buffer-advice))
 
 ;;;###autoload
