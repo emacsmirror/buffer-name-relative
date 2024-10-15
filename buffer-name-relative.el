@@ -133,10 +133,9 @@ Any errors are demoted into messages."
         (let ((name-base-test
                (condition-case err
                    (funcall fn filepath)
-                 (error
-                  (message "Error calling \"%s\": %s" (symbol-name fn) err)
-                  ;; Resolve to nil.
-                  nil))))
+                 (error (message "Error calling \"%s\": %s" (symbol-name fn) err)
+                        ;; Resolve to nil.
+                        nil))))
           (when name-base-test
             (setq name-base name-base-test)
             ;; Break.
