@@ -60,8 +60,8 @@ Customization
    .. code-block::
 
       (setq buffer-name-relative-prefix-map
-            '("/src/dotfiles" . "DOT")
-             ("/src/project" . "PRJ")))
+            '(("/src/dotfiles" . "DOT")
+              ("/src/project" . "PRJ")))
 
 ``buffer-name-relative-root-functions``: ``(list 'buffer-name-relative-root-path-from-vc)``
    A list of functions that take a file-path and return a string or nil.
