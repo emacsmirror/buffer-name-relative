@@ -196,7 +196,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
         (setq str-body
               (cond
                ((null str-body)
-                (file-name-base base-path-noslash))
+                (file-name-nondirectory base-path-noslash))
                (t
                 (format "%S" str-body)))))
       (unless (stringp str-beg)
