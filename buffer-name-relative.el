@@ -133,9 +133,10 @@ Any errors are demoted into messages."
         (let ((name-base-test
                (condition-case err
                    (funcall fn filepath)
-                 (error (message "Error calling \"%s\": %s" (symbol-name fn) err)
-                        ;; Resolve to nil.
-                        nil))))
+                 (error
+                  (message "Error calling \"%s\": %s" (symbol-name fn) err)
+                  ;; Resolve to nil.
+                  nil))))
           (when name-base-test
             (setq name-base name-base-test)
             ;; Break.
@@ -172,7 +173,8 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
                 (setq name-id (1+ name-id)))
               (with-current-buffer buf
                 (rename-buffer name-unique)))))
-      (error (message "Error creating vc-backend root name: %s" err)))
+      (error
+       (message "Error creating vc-backend root name: %s" err)))
     buf))
 
 (defun buffer-name-relative--root-path-calc-prefix (base-path)
@@ -292,7 +294,8 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
           (let ((default-directory dir))
             (condition-case-unless-debug err
                 (setq result (funcall #'ffip-project-root))
-              (error (message "Error finding FFIP root name: %s" err)))))))
+              (error
+               (message "Error finding FFIP root name: %s" err)))))))
     result))
 
 (defun buffer-name-relative-root-path-from-projectile (filepath)
@@ -304,7 +307,8 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
         (when dir
           (condition-case-unless-debug err
               (setq result (funcall #'projectile-project-root dir))
-            (error (message "Error finding PROJECTILE root name: %s" err))))))
+            (error
+             (message "Error finding PROJECTILE root name: %s" err))))))
     result))
 
 ;; ---------------------------------------------------------------------------
