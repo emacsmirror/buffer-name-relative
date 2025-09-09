@@ -86,11 +86,11 @@ Any errors are demoted into messages."
           (setq beg (1+ beg))
           (let ((len 1)
                 (trunc (- end beg)))
-            (setq overflow (- overflow trunc))
+            (decf overflow trunc)
             (when (< overflow 0)
-              (setq beg (- beg overflow))
-              (setq trunc (+ trunc overflow))
-              (setq len (- len overflow))
+              (decf beg overflow)
+              (incf trunc overflow)
+              (decf len overflow)
               (setq overflow 0))
             ;; The resulting abbreviated name.
             (cons
