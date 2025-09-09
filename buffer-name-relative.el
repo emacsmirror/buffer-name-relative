@@ -83,7 +83,7 @@ Any errors are demoted into messages."
       (let ((end (string-search "/" path beg)))
         (cond
          (end
-          (setq beg (1+ beg))
+          (incf beg)
           (let ((len 1)
                 (trunc (- end beg)))
             (decf overflow trunc)
@@ -170,7 +170,7 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
                   (name-id 0))
               (while (get-buffer name-unique)
                 (setq name-unique (concat name-base (format " <%d>" name-id)))
-                (setq name-id (1+ name-id)))
+                (incf name-id))
               (with-current-buffer buf
                 (rename-buffer name-unique)))))
       (error
