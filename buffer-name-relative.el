@@ -329,6 +329,21 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
              (message "Error finding PROJECTILE root name: %s" err))))))
     result))
 
+(defun buffer-name-relative-root-path-from-project (filepath)
+  "Return the PROJECT directory from FILEPATH or nil."
+  (declare (important-return-value t))
+  (let ((result nil))
+    (when (and (fboundp 'project-current) (fboundp 'project-root))
+      (let ((dir (file-name-directory filepath)))
+        (when dir
+          (condition-case-unless-debug err
+              (let ((project (funcall #'project-current nil dir)))
+                (when project
+                  (setq result (funcall #'project-root project))))
+            (error
+             (message "Error finding PROJECT root name: %s" err))))))
+    result))
+
 ;; ---------------------------------------------------------------------------
 ;; Global Mode
 

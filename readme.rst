@@ -73,6 +73,7 @@ Customization
 
    - ``buffer-name-relative-root-path-from-ffip``
    - ``buffer-name-relative-root-path-from-projectile``
+   - ``buffer-name-relative-root-path-from-project``
    - ``buffer-name-relative-root-path-from-vc`` (default).
 
 ``buffer-name-relative-abbrev-limit``: 0
