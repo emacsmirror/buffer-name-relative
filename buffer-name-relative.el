@@ -15,7 +15,7 @@
 ;; Provide a global mode to make file buffer names root/VC relative.
 ;;
 
-;;; Usage
+;;; Usage:
 
 ;;
 ;; Write the following code to your .emacs file:
@@ -74,7 +74,7 @@ otherwise the parent directory will be used."
   "List of functions symbols which take a file-path and return a root path or nil.
 The non-nil result of any function is used as the root path.
 Any errors are demoted into messages."
-  :type '(repeat symbol))
+  :type '(repeat function))
 
 (defcustom buffer-name-relative-fallback 'default
   "Behavior when the root directory can't be found."
@@ -178,7 +178,7 @@ Advice around `create-file-buffer'.
 Wrap ORIG-FN, which creates a buffer from FILEPATH."
   (declare (important-return-value t))
   (let ((buf (funcall orig-fn filepath)))
-    ;; Error's are very unlikely, this is to ensure even the most remote
+    ;; Errors are very unlikely, this is to ensure even the most remote
     ;; chance of an error doesn't make the file fail to load.
     (condition-case-unless-debug err
         (when buf
@@ -307,13 +307,12 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
   (declare (important-return-value t))
   (let ((result nil))
     (when (fboundp 'ffip-project-root)
-      (let ((dir (file-name-directory filepath)))
-        (when dir
-          (let ((default-directory dir))
-            (condition-case-unless-debug err
-                (setq result (funcall #'ffip-project-root))
-              (error
-               (message "Error finding FFIP root name: %s" err)))))))
+      (when-let* ((dir (file-name-directory filepath)))
+        (let ((default-directory dir))
+          (condition-case-unless-debug err
+              (setq result (funcall #'ffip-project-root))
+            (error
+             (message "Error finding FFIP root name: %s" err))))))
     result))
 
 (defun buffer-name-relative-root-path-from-projectile (filepath)
@@ -321,12 +320,11 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
   (declare (important-return-value t))
   (let ((result nil))
     (when (fboundp 'projectile-project-root)
-      (let ((dir (file-name-directory filepath)))
-        (when dir
-          (condition-case-unless-debug err
-              (setq result (funcall #'projectile-project-root dir))
-            (error
-             (message "Error finding PROJECTILE root name: %s" err))))))
+      (when-let* ((dir (file-name-directory filepath)))
+        (condition-case-unless-debug err
+            (setq result (funcall #'projectile-project-root dir))
+          (error
+           (message "Error finding PROJECTILE root name: %s" err)))))
     result))
 
 (defun buffer-name-relative-root-path-from-project (filepath)
@@ -334,14 +332,12 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
   (declare (important-return-value t))
   (let ((result nil))
     (when (and (fboundp 'project-current) (fboundp 'project-root))
-      (let ((dir (file-name-directory filepath)))
-        (when dir
-          (condition-case-unless-debug err
-              (let ((project (funcall #'project-current nil dir)))
-                (when project
-                  (setq result (funcall #'project-root project))))
-            (error
-             (message "Error finding PROJECT root name: %s" err))))))
+      (when-let* ((dir (file-name-directory filepath)))
+        (condition-case-unless-debug err
+            (when-let* ((project (funcall #'project-current nil dir)))
+              (setq result (funcall #'project-root project)))
+          (error
+           (message "Error finding PROJECT root name: %s" err)))))
     result))
 
 ;; ---------------------------------------------------------------------------
@@ -353,13 +349,13 @@ Wrap ORIG-FN, which creates a buffer from FILEPATH."
   (advice-add 'create-file-buffer :around #'buffer-name-relative--create-file-buffer-advice))
 
 (defun buffer-name-relative--mode-disable ()
-  "Turn on `buffer-name-relative-mode' globally."
+  "Turn off `buffer-name-relative-mode' globally."
   (declare (important-return-value nil))
   (advice-remove 'create-file-buffer #'buffer-name-relative--create-file-buffer-advice))
 
 ;;;###autoload
 (define-minor-mode buffer-name-relative-mode
-  "Toggle saving the undo data in the current buffer (Undo-Fu Session Mode)."
+  "Toggle relative buffer names."
   :global t
 
   (cond
