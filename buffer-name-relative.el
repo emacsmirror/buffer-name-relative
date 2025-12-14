@@ -8,7 +8,7 @@
 ;; URL: https://codeberg.org/ideasman42/emacs-buffer-name-relative
 ;; Keywords: convenience
 ;; Version: 0.1
-;; Package-Requires: ((emacs "28.1"))
+;; Package-Requires: ((emacs "29.1"))
 
 ;;; Commentary:
 
@@ -137,9 +137,7 @@ Any errors are demoted into messages."
      ((<= overflow 0)
       path)
      (t
-      (mapconcat #'identity (buffer-name-relative--abbrev-directory-impl path overflow)
-                 ;; emacs-29+ can remove this separator.
-                 "")))))
+      (mapconcat #'identity (buffer-name-relative--abbrev-directory-impl path overflow))))))
 
 (defun buffer-name-relative--root-path-lookup (filepath)
   "Lookup `buffer-name-relative-root-functions' using FILEPATH for a relative directory."
